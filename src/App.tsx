@@ -1,35 +1,113 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useReducer } from 'react'
 import './App.css'
+import Divider from './Divider/Divider'
+import TodoHeader from './Header/TodoHeader'
+import TodoInput from './Input/TodoInput'
+import TodoList from './List/TodoList'
+import TodoListTools from './Tools/TodoListTools'
+import TodoListArea from './List/TodoListArea'
+import { todoInputReducer } from './Todo/todoInputReducer'
+import { todoReducer } from './Todo/todoReducer'
+
+const initialInputState = {
+    text: '',
+}
+
+const initialTodoState = {
+    todos: [],
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [inputState, inputDispatch] = useReducer(todoInputReducer, initialInputState)
 
-  return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+    const [todoState, todoDispatch] = useReducer(todoReducer, initialTodoState)
+
+    const handleTextChange = (text: string) => {
+        inputDispatch({
+            type: 'change',
+            payload: text,
+        })
+    }
+
+    const handleSubmit = () => {
+        if (!inputState.text) {
+            return
+        }
+
+        todoDispatch({
+            type: 'add',
+            payload: {
+                text: inputState.text,
+            },
+        })
+
+        inputDispatch({
+            type: 'clear',
+        })
+    }
+
+    const handleToggleClick = (id: number) => {
+        todoDispatch({
+            type: 'checked',
+            payload: {
+                id,
+            },
+        })
+    }
+
+    const handleRemoveClick = (id: number) => {
+        todoDispatch({
+            type: 'remove',
+            payload: {
+                id,
+            },
+        })
+    }
+
+    const isTodoAllChecked = () => {
+        return todoState.todos.every((todo) => todo.isChecked)
+    }
+
+    const handleToggleAllClick = () => {
+        const isAllChecked = isTodoAllChecked()
+
+        todoDispatch({
+            type: 'allChecked',
+            payload: {
+                isAllChecked,
+            },
+        })
+    }
+
+    const handleRemoveAllClick = () => {
+        todoDispatch({
+            type: 'allRemove',
+        })
+    }
+
+    return (
+        <div className="App">
+            <TodoHeader todoCount={todoState.todos.filter((todo) => !todo.isChecked).length} />
+            <TodoInput
+                text={inputState.text}
+                onTextChange={handleTextChange}
+                onSubmit={handleSubmit}
+            />
+            <TodoListArea todoCount={todoState.todos.length}>
+                <TodoListTools
+                    isAllChecked={isTodoAllChecked()}
+                    onToggleAllClick={handleToggleAllClick}
+                    onRemoveAllClick={handleRemoveAllClick}
+                />
+                <Divider />
+                <TodoList
+                    todos={todoState.todos}
+                    onToggleClick={handleToggleClick}
+                    onRemoveClick={handleRemoveClick}
+                />
+            </TodoListArea>
+        </div>
+    )
 }
 
 export default App
