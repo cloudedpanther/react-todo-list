@@ -2,22 +2,33 @@ import styles from './TodoItem.module.css'
 import { BsCheckCircle } from 'react-icons/bs'
 import { IoIosRemoveCircleOutline } from 'react-icons/io'
 import { TodoType } from '../Todo/todoReducer'
+import { useTodoDispatch } from '../Todo/TodoProvider'
 
 interface TodoItemProps {
     todo: TodoType
-    onToggleClick: (id: number) => void
-    onRemoveClick: (id: number) => void
 }
 
-export default function TodoItem({ todo, onToggleClick, onRemoveClick }: TodoItemProps) {
+export default function TodoItem({ todo }: TodoItemProps) {
+    const todoDispatch = useTodoDispatch()
+
     const { id, text, isChecked } = todo
 
     const handleToggleClick = () => {
-        onToggleClick(id)
+        todoDispatch({
+            type: 'checked',
+            payload: {
+                id,
+            },
+        })
     }
 
     const handleRemoveClick = () => {
-        onRemoveClick(id)
+        todoDispatch({
+            type: 'remove',
+            payload: {
+                id,
+            },
+        })
     }
 
     return (

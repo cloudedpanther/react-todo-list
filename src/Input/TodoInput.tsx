@@ -1,26 +1,39 @@
 import { RiChatNewLine } from 'react-icons/ri'
 import { ChangeEvent, FormEvent } from 'react'
 import styles from './TodoInput.module.css'
+import { useInputDispatch, useInputState, useTodoDispatch } from '../Todo/TodoProvider'
 
-interface TodoInputProps {
-    text: string
-    onTextChange: (text: string) => void
-    onSubmit: () => void
-}
+export default function TodoInput() {
+    const inputState = useInputState()
+    const inputDispatch = useInputDispatch()
+    const todoDispatch = useTodoDispatch()
 
-export default function TodoInput({ text, onTextChange, onSubmit }: TodoInputProps) {
+    const { text } = inputState
+
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        onTextChange(e.target.value)
+        inputDispatch({
+            type: 'change',
+            payload: e.target.value,
+        })
     }
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        if (text === '') {
+        if (!text) {
             return
         }
 
-        onSubmit()
+        todoDispatch({
+            type: 'add',
+            payload: {
+                text,
+            },
+        })
+
+        inputDispatch({
+            type: 'clear',
+        })
     }
 
     return (

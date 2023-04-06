@@ -2,24 +2,27 @@ import styles from './TodoListTools.module.css'
 import { IoCheckmarkDoneCircleOutline } from 'react-icons/io5'
 import { MdDelete } from 'react-icons/md'
 import { CgRadioCheck } from 'react-icons/cg'
+import { useTodoDispatch, useTodoState } from '../Todo/TodoProvider'
 
-interface TodoListToolsProps {
-    isAllChecked: Boolean
-    onToggleAllClick: () => void
-    onRemoveAllClick: () => void
-}
+export default function TodoListTools() {
+    const todoState = useTodoState()
+    const todoDispatch = useTodoDispatch()
 
-export default function TodoListTools({
-    isAllChecked,
-    onToggleAllClick,
-    onRemoveAllClick,
-}: TodoListToolsProps) {
+    const isAllChecked = todoState.todos.every((todo) => todo.isChecked)
+
     const handleToggleAllClick = () => {
-        onToggleAllClick()
+        todoDispatch({
+            type: 'allChecked',
+            payload: {
+                isAllChecked,
+            },
+        })
     }
 
     const handleRemoveAllClick = () => {
-        onRemoveAllClick()
+        todoDispatch({
+            type: 'allRemove',
+        })
     }
 
     return (
